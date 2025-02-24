@@ -5,11 +5,11 @@ import { useAppDispatch, useAppSelector } from "common/hooks"
 import { getTheme } from "common/theme"
 import { useEffect } from "react"
 import { Outlet } from "react-router-dom"
-import { initializeAppTC } from "../features/auth/model/auth-slice"
-import { selectIsInitialized } from "../features/auth/model/authSelectors"
-import { selectThemeMode } from "./appSelectors"
+import { initializeAppTC, selectIsInitialized } from "../features/auth/model/auth-slice"
+
 import CircularProgress from "@mui/material/CircularProgress"
 import s from "./App.module.css"
+import { selectThemeMode } from "./app-slice"
 
 export const App = () => {
   const themeMode = useAppSelector(selectThemeMode)

@@ -7,7 +7,7 @@ import { Dispatch } from "redux"
 import { authApi } from "../api/authAPI"
 import { LoginArgs } from "../api/authAPI.types"
 import { clearTodolists } from "features/todolists/model/todolistsSlice"
-import { clearTasks } from "features/todolists/model/tasks-reducer"
+import { clearTasks } from "features/todolists/model/tasksSlice"
 
 
 export const authSlice = createSlice({
@@ -33,11 +33,16 @@ export const authSlice = createSlice({
 			setIsInitialized: create.reducer<{isInitialized: boolean}>((state, action) => {
 				state.isInitialized = action.payload.isInitialized
 			}),
-	})
+	}),
+	selectors: {
+		selectIsLoggedIn: (state) => state.isLoggedIn,
+		selectIsInitialized: (state) => state.isInitialized
+	}
 })
 
 export const authReducer = authSlice.reducer
 export const {setIsInitialized, setIsLoggedIn} = authSlice.actions
+export const {selectIsInitialized, selectIsLoggedIn} = authSlice.selectors
 
 
 // thunks

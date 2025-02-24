@@ -35,7 +35,7 @@ export const tasksSlice = createSlice({
 		updateTask: create.reducer<{taskId: string; todolistId: string; domainModel: UpdateTaskDomainModel}>((state, action) => {
 			const tasks = state[action.payload.todolistId]
 			const index = tasks.findIndex((task) => task.id === action.payload.taskId )
-			if (index !== 1) tasks[index] = {...tasks[index], ...action.payload.domainModel}
+			if (index !== -1) tasks[index] = {...tasks[index], ...action.payload.domainModel}
 		}),
 		clearTasks: create.reducer(() => {
 			return {}
@@ -52,10 +52,14 @@ export const tasksSlice = createSlice({
 			delete state[action.payload.id]
 		})
 	},
+	selectors: {
+		selectTasks: (state) => state
+	}
 })
 
 export const {addTask, clearTasks,  removeTask, setTasks, updateTask} = tasksSlice.actions
 export const tasksReducer = tasksSlice.reducer
+export const {selectTasks} = tasksSlice.selectors
 
 
 

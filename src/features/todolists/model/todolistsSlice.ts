@@ -34,7 +34,7 @@ export const todolistsSlice = createSlice({
 
 		changeTodolistTitle: create.reducer<{id: string; title: string}>((state, action) => {
 			const index = state.findIndex(todo => todo.id === action.payload.id)
-			if (index !== 1) state[index].title = action.payload.title
+			if (index !== -1) state[index].title = action.payload.title
 			
 		}),
 
@@ -44,7 +44,7 @@ export const todolistsSlice = createSlice({
 		}),
 		changeTodolistEntityStatus: create.reducer<{  id: string; entityStatus: RequestStatus}>((state, action) => {
 			const index = state.findIndex(todo => todo.id === action.payload.id)
-			if (index !== 1) state[index].entityStatus = action.payload.entityStatus
+			if (index !== -1) state[index].entityStatus = action.payload.entityStatus
 		}),
 		setTodolists: create.reducer<{todolists: Todolist[]}>((state, action) => {
 			// 1 var
@@ -62,12 +62,16 @@ export const todolistsSlice = createSlice({
 			//  2 var 
 			// state.length = 0
 		}),
-	})
+	}),
+	selectors: {
+		selectTodolists: (state) => state
+	}
 })
 
 export const todolistsReducer = todolistsSlice.reducer
 export const {addTodolist, changeTodolistEntityStatus, changeTodolistFilter,
 changeTodolistTitle, clearTodolists, removeTodolist,setTodolists} = todolistsSlice.actions
+export const {selectTodolists} = todolistsSlice.selectors
 
 // Thunks
 export const fetchTodolistsTC = () => (dispatch: Dispatch) => {
