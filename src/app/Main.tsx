@@ -4,7 +4,7 @@ import { Path } from "common/router"
 import { AddItemForm } from "common/components"
 import { useAppDispatch, useAppSelector } from "common/hooks"
 import { Navigate } from "react-router-dom"
-import { addTodolistTC } from "../features/todolists/model/todolistsSlice"
+import { addTodolist as addTodolistThunk} from "../features/todolists/model/todolistsSlice"
 import { Todolists } from "../features/todolists/ui/Todolists/Todolists"
 import { selectIsLoggedIn } from "features/auth/model/auth-slice"
 
@@ -14,7 +14,7 @@ export const Main = () => {
   const isLoggedIn = useAppSelector(selectIsLoggedIn)
 
   const addTodolist = (title: string) => {
-    dispatch(addTodolistTC(title))
+    dispatch(addTodolistThunk(title))
   }
 
   if (!isLoggedIn) {

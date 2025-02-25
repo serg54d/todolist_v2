@@ -7,7 +7,7 @@ import Toolbar from "@mui/material/Toolbar"
 import { useAppDispatch, useAppSelector } from "common/hooks"
 import { getTheme } from "common/theme"
 import { MenuButton } from "common/components"
-import { logoutTC, selectIsLoggedIn } from "../../../features/auth/model/auth-slice"
+import { logout, selectIsLoggedIn } from "../../../features/auth/model/auth-slice"
 import { changeTheme, selectAppStatus, selectThemeMode } from "app/app-slice"
 
 export const Header = () => {
@@ -24,7 +24,7 @@ export const Header = () => {
   }
 
   const logoutHandler = () => {
-    dispatch(logoutTC())
+    dispatch(logout())
   }
 
   return (
