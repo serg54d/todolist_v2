@@ -6,6 +6,7 @@ import { RequestStatus, setAppStatus} from "../../../app/app-slice"
 import { todolistsApi } from "../api/todolistsApi"
 import { Todolist } from "../api/todolistsApi.types"
 import { createSlice } from "@reduxjs/toolkit"
+import { clearTasksAndTodolists } from "common/actions/common.actions"
 
 export type FilterValuesType = "all" | "active" | "completed"
 
@@ -55,22 +56,27 @@ export const todolistsSlice = createSlice({
 				state.push({ ...tl, filter: "all", entityStatus: "idle" })
 			})
 		}),
-		clearTodolists: create.reducer((state, action) => {
-			// 1 var
-			return []
+		// clearTodolists: create.reducer((state, action) => {
+		// 	// 1 var
+		// 	return []
 
-			//  2 var 
-			// state.length = 0
-		}),
+		// 	//  2 var 
+		// 	// state.length = 0
+		// }),
 	}),
 	selectors: {
 		selectTodolists: (state) => state
-	}
+	},
+	extraReducers(builder) {
+		builder.addCase(clearTasksAndTodolists, (state, action) => {
+			return []
+		})
+	},
 })
 
 export const todolistsReducer = todolistsSlice.reducer
 export const {addTodolist, changeTodolistEntityStatus, changeTodolistFilter,
-changeTodolistTitle, clearTodolists, removeTodolist,setTodolists} = todolistsSlice.actions
+changeTodolistTitle, removeTodolist,setTodolists} = todolistsSlice.actions
 export const {selectTodolists} = todolistsSlice.selectors
 
 // Thunks
