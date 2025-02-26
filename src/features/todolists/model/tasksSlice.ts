@@ -1,18 +1,15 @@
 import { ResultCode } from "common/enums"
 import { handleServerAppError } from "common/utils/handleServerAppError"
 import { handleServerNetworkError } from "common/utils/handleServerNetworkError"
-import { Dispatch } from "redux"
-import { AppDispatch, RootState } from "../../../app/store"
+import { RootState } from "../../../app/store"
 import { tasksApi } from "../api/tasksApi"
 import { DomainTask, UpdateTaskDomainModel, UpdateTaskModel } from "../api/tasksApi.types"
 // import { AddTodolistActionType, RemoveTodolistActionType } from "./todolistsSlice"
+import { asyncThunkCreator, buildCreateSlice } from "@reduxjs/toolkit"
 import { setAppError, setAppStatus } from "app/app-slice"
-import { asyncThunkCreator, buildCreateSlice, createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit"
-import { addTodolist, removeTodolist } from "./todolistsSlice"
 import { clearTasksAndTodolists } from "common/actions/common.actions"
-import { createAppAsyncThunk } from "common/utils/createAppAsyncThunk"
 import { BaseResponse } from "common/types"
-import { Try } from "@mui/icons-material"
+import { addTodolist, removeTodolist } from "./todolistsSlice"
 
 export type TasksStateType = {
     [key: string]: DomainTask[]

@@ -1,10 +1,10 @@
-import { applyMiddleware, combineReducers, legacy_createStore, UnknownAction } from "redux"
-import { thunk, ThunkDispatch } from "redux-thunk"
+import { configureStore } from "@reduxjs/toolkit"
+import { UnknownAction } from "redux"
+import { ThunkDispatch } from "redux-thunk"
 import { authReducer, authSlice } from "../features/auth/model/auth-slice"
 import { tasksReducer, tasksSlice } from "../features/todolists/model/tasksSlice"
 import { todolistsReducer, todolistsSlice } from "../features/todolists/model/todolistsSlice"
 import { appReducer, appSlice } from "./app-slice"
-import { configureStore } from "@reduxjs/toolkit"
 
 export const store = configureStore({
   reducer: {

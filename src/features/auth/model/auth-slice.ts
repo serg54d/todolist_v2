@@ -1,13 +1,12 @@
-import { asyncThunkCreator, buildCreateSlice, createSlice } from "@reduxjs/toolkit"
+import { asyncThunkCreator, buildCreateSlice } from "@reduxjs/toolkit"
 import { setAppStatus } from "app/app-slice"
+import { clearTasksAndTodolists } from "common/actions/common.actions"
 import { ResultCode } from "common/enums"
+import { FieldError } from "common/types"
 import { handleServerAppError } from "common/utils/handleServerAppError"
 import { handleServerNetworkError } from "common/utils/handleServerNetworkError"
-import { Dispatch } from "redux"
 import { authApi } from "../api/authAPI"
 import { LoginArgs } from "../api/authAPI.types"
-import { clearTasksAndTodolists } from "common/actions/common.actions"
-import { BaseResponse } from "common/types"
 
 const createSliceWithThunks = buildCreateSlice({
     creators: { asyncThunk: asyncThunkCreator },
@@ -19,20 +18,11 @@ export const authSlice = createSliceWithThunks({
         isLoggedIn: false,
         isInitialized: false,
     },
-    // reducers: {
-    // 	setIsLoggedIn: (state, action:PayloadAction<{isLoggedIn: boolean}>) => {
-    // 		// return { ...state, isLoggedIn: action.payload.isLoggedIn }
-    // 		state.isLoggedIn = action.payload.isLoggedIn
-    // 	},
-    // 	setIsInitialized: (state, action:PayloadAction<{isInitialized: boolean}>) => {
-    // 		// return { ...state, isInitialized: action.payload.isInitialized }
-    // 		state.isInitialized = action.payload.isInitialized
-    // 	}
-    // }
+
     reducers: (create) => {
-        const createAThunk = create.asyncThunk.withTypes<{ rejectValue: null | BaseResponse }>()
+        const createAThunk = create.asyncThunk.withTypes<{ rejectValue:  {errors: Array<string>, fieldsErrors?: FieldError[]   }}>()
         return {
-            login: createAThunk(
+            login: create.asyncThunk(
                 async (data: LoginArgs, thunkAPI) => {
                     const { dispatch, rejectWithValue } = thunkAPI
                     dispatch(setAppStatus({ status: "loading" }))
@@ -42,19 +32,22 @@ export const authSlice = createSliceWithThunks({
                             dispatch(setAppStatus({ status: "succeeded" }))
                             // dispatch(setIsLoggedIn({ isLoggedIn: true }))
                             localStorage.setItem("sn-token", res.data.data.token)
-                            return { isLoggedIn: true }
+                            return;
                         } else {
                             handleServerAppError(res.data, dispatch)
-                            return rejectWithValue(null)
+                             return rejectWithValue({
+                                 errors: res.data.messages, // Используем messages вместо errors
+                                 fieldsErrors: res.data.fieldsErrors,
+                             })
                         }
                     } catch (error: any) {
                         handleServerNetworkError(error, dispatch)
-                        return rejectWithValue(error)
+                        return rejectWithValue({ errors: [error.message], fieldsErrors: undefined })
                     }
                 },
                 {
-                    fulfilled: (state, action) => {
-                        state.isLoggedIn = action.payload.isLoggedIn
+                    fulfilled: (state) => {
+                        state.isLoggedIn = true
                     },
                 },
             ),
@@ -68,19 +61,19 @@ export const authSlice = createSliceWithThunks({
                             dispatch(setAppStatus({ status: "succeeded" }))
                             dispatch(clearTasksAndTodolists())
                             localStorage.removeItem("sn-token")
-                            return { isLoggedIn: false }
+                            return;
                         } else {
                             handleServerAppError(res.data, dispatch)
-                            return rejectWithValue(null)
+                            return rejectWithValue({ errors: res.data.messages, fieldsErrors: res.data.fieldsErrors })
                         }
                     } catch (error: any) {
                         handleServerNetworkError(error, dispatch)
-                        return rejectWithValue(error)
+                        return rejectWithValue({ errors: [], fieldsErrors: undefined })
                     }
                 },
                 {
-                    fulfilled: (state, action) => {
-                        state.isLoggedIn = action.payload.isLoggedIn
+                    fulfilled: (state) => {
+                        state.isLoggedIn = false
                     },
                 },
             ),
@@ -93,19 +86,20 @@ export const authSlice = createSliceWithThunks({
                         if (res.data.resultCode === ResultCode.Success) {
                             dispatch(setAppStatus({ status: "succeeded" }))
                             // dispatch(setIsLoggedIn({ isLoggedIn: true }))
-                            return { isLoggedIn: true }
+                            return;
                         } else {
                             handleServerAppError(res.data, dispatch)
-                            return rejectWithValue(null)
+							return rejectWithValue({ errors: res.data.messages, fieldsErrors: res.data.fieldsErrors })
+                           
                         }
                     } catch (error: any) {
                         handleServerNetworkError(error, dispatch)
-                        return rejectWithValue(error)
+                        return rejectWithValue({ errors: [], fieldsErrors: undefined })
                     }
                 },
                 {
-                    fulfilled: (state, action) => {
-                        state.isLoggedIn = action.payload.isLoggedIn
+                    fulfilled: (state) => {
+                        state.isLoggedIn = true
                     },
                     settled: (state) => {
                         state.isInitialized = true
@@ -123,44 +117,3 @@ export const authSlice = createSliceWithThunks({
 export const authReducer = authSlice.reducer
 export const { initializeApp, login, logout } = authSlice.actions
 export const { selectIsInitialized, selectIsLoggedIn } = authSlice.selectors
-
-// thunks
-
-// export const logoutTC = () => (dispatch: Dispatch) => {
-//     dispatch(setAppStatus({ status: "loading" }))
-//     authApi
-//         .logout()
-//         .then((res) => {
-//             if (res.data.resultCode === ResultCode.Success) {
-//                 dispatch(setAppStatus({ status: "succeeded" }))
-//                 dispatch(setIsLoggedIn({ isLoggedIn: false }))
-//                 dispatch(clearTasksAndTodolists())
-//                 localStorage.removeItem("sn-token")
-//             } else {
-//                 handleServerAppError(res.data, dispatch)
-//             }
-//         })
-//         .catch((error) => {
-//             handleServerNetworkError(error, dispatch)
-//         })
-// }
-
-// export const initializeAppTC = () => (dispatch: Dispatch) => {
-//     dispatch(setAppStatus({ status: "loading" }))
-//     authApi
-//         .me()
-//         .then((res) => {
-//             if (res.data.resultCode === ResultCode.Success) {
-//                 dispatch(setAppStatus({ status: "succeeded" }))
-//                 dispatch(setIsLoggedIn({ isLoggedIn: true }))
-//             } else {
-//                 handleServerAppError(res.data, dispatch)
-//             }
-//         })
-//         .catch((error) => {
-//             handleServerNetworkError(error, dispatch)
-//         })
-//         .finally(() => {
-//             dispatch(setIsInitialized({ isInitialized: true }))
-//         })
-// }

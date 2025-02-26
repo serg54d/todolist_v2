@@ -1,16 +1,12 @@
+import { asyncThunkCreator, buildCreateSlice } from "@reduxjs/toolkit"
+import { clearTasksAndTodolists } from "common/actions/common.actions"
 import { ResultCode } from "common/enums"
+import { BaseResponse } from "common/types"
 import { handleServerAppError } from "common/utils/handleServerAppError"
 import { handleServerNetworkError } from "common/utils/handleServerNetworkError"
-import { Dispatch } from "redux"
-import { RequestStatus, setAppError, setAppStatus } from "../../../app/app-slice"
+import { RequestStatus, setAppStatus } from "../../../app/app-slice"
 import { todolistsApi } from "../api/todolistsApi"
 import { Todolist } from "../api/todolistsApi.types"
-import { asyncThunkCreator, buildCreateSlice, createSlice } from "@reduxjs/toolkit"
-import { clearTasksAndTodolists } from "common/actions/common.actions"
-import { BaseResponse } from "common/types"
-import { UpdateTaskDomainModel, UpdateTaskModel } from "../api/tasksApi.types"
-import { RootState } from "app/store"
-import { tasksApi } from "../api/tasksApi"
 
 export type FilterValuesType = "all" | "active" | "completed"
 
@@ -68,6 +64,7 @@ export const todolistsSlice = createSliceWithThunks({
                         const res = await todolistsApi.createTodolist(title)
                         if (res.data.resultCode === ResultCode.Success) {
                             dispatch(setAppStatus({ status: "succeeded" }))
+							debugger
                             return { todolist: res.data.data.item }
                         } else {
                             handleServerAppError(res.data, dispatch)
