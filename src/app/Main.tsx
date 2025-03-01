@@ -1,34 +1,35 @@
 import Container from "@mui/material/Container"
 import Grid from "@mui/material/Unstable_Grid2"
-import { Path } from "common/router"
 import { AddItemForm } from "common/components"
 import { useAppDispatch, useAppSelector } from "common/hooks"
+import { Path } from "common/router"
+
+import { useCreateTodolistMutation } from "features/todolists/api/todolistsApi"
 import { Navigate } from "react-router-dom"
-import { addTodolist as addTodolistThunk} from "../features/todolists/model/todolistsSlice"
 import { Todolists } from "../features/todolists/ui/Todolists/Todolists"
-import { selectIsLoggedIn } from "features/auth/model/auth-slice"
+import { selectIsLoggedIn } from "./app-slice"
 
 export const Main = () => {
-  const dispatch = useAppDispatch()
+    const isLoggedIn = useAppSelector(selectIsLoggedIn)
 
-  const isLoggedIn = useAppSelector(selectIsLoggedIn)
+    const [createTodolist, {}] = useCreateTodolistMutation()
 
-  const addTodolist = (title: string) => {
-    dispatch(addTodolistThunk(title))
-  }
+    const addTodolist = (title: string) => {
+        createTodolist(title)
+    }
 
-  if (!isLoggedIn) {
-    return <Navigate to={Path.Login} />
-  }
+    if (!isLoggedIn) {
+        return <Navigate to={Path.Login} />
+    }
 
-  return (
-    <Container fixed>
-      <Grid container sx={{ mb: "30px" }}>
-        <AddItemForm addItem={addTodolist} />
-      </Grid>
-      <Grid container spacing={4}>
-        <Todolists />
-      </Grid>
-    </Container>
-  )
+    return (
+        <Container fixed>
+            <Grid container sx={{ mb: "30px" }}>
+                <AddItemForm addItem={addTodolist} />
+            </Grid>
+            <Grid container spacing={4}>
+                <Todolists />
+            </Grid>
+        </Container>
+    )
 }

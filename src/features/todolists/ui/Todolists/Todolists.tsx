@@ -1,31 +1,32 @@
 import Paper from "@mui/material/Paper"
 import Grid from "@mui/material/Unstable_Grid2"
-import { useEffect } from "react"
-import { useAppDispatch, useAppSelector } from "common/hooks"
-import { fetchTodolists, selectTodolists } from "../../model/todolistsSlice"
 
+import { useGetTodolistsQuery, useLazyGetTodolistsQuery } from "features/todolists/api/todolistsApi"
 import { Todolist } from "./Todolist/Todolist"
 
 export const Todolists = () => {
-  const todolists = useAppSelector(selectTodolists)
+    const { data: todolists, refetch } = useGetTodolistsQuery(undefined, { skip: false })
+    // const [trigger, { data: todolists }] = useLazyGetTodolistsQuery()
 
-  const dispatch = useAppDispatch()
+    // const handlerGetTodo = () => {
+	// 	trigger()
+	// }
 
-  useEffect(() => {
-    dispatch(fetchTodolists())
-  }, [])
-
-  return (
-    <>
-      {todolists.map((tl) => {
-        return (
-          <Grid key={tl.id}>
-            <Paper sx={{ p: "0 20px 20px 20px" }}>
-              <Todolist key={tl.id} todolist={tl} />
-            </Paper>
-          </Grid>
-        )
-      })}
-    </>
-  )
+    return (
+        <>
+            {todolists?.map((tl) => {
+                return (
+                    <>
+					{/* <button onClick={refetch}>Получить свежие данные</button> */}
+                        {/* <button onClick={handlerGetTodo}></button> */}
+                        <Grid key={tl.id}>
+                            <Paper sx={{ p: "0 20px 20px 20px" }}>
+                                <Todolist key={tl.id} todolist={tl} />
+                            </Paper>
+                        </Grid>
+                    </>
+                )
+            })}
+        </>
+    )
 }

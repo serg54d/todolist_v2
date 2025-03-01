@@ -10,10 +10,12 @@ import { useAppDispatch, useAppSelector } from "common/hooks"
 import { getTheme } from "common/theme"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
 import { Navigate } from "react-router-dom"
-import { login, selectIsLoggedIn } from "../../model/auth-slice"
+import { selectIsLoggedIn, setIsLoggedIn } from "./../../../../app/app-slice"
 
 import { selectThemeMode } from "app/app-slice"
 import { FieldError } from "common/types"
+import { useLoginMutation } from "features/auth/api/authAPI"
+import { ResultCode } from "common/enums"
 
 type Inputs = {
     email: string
@@ -28,6 +30,8 @@ export const Login = () => {
 
     const dispatch = useAppDispatch()
 
+    const [login, {}] = useLoginMutation()
+
     const {
         register,
         handleSubmit,
@@ -38,29 +42,32 @@ export const Login = () => {
     } = useForm<Inputs>({ defaultValues: { email: "", password: "", rememberMe: false } })
 
     const onSubmit: SubmitHandler<Inputs> = async (data) => {
-        const res = (await dispatch(login(data))) as {
-            payload?: { errors: string[]; fieldsErrors?: FieldError[] }
-        }
-
-		 console.log("Payload:", res.payload)
-        console.log("Response:", res) // Отладка
-        console.log("Is rejected?", login.rejected.match(res)) // Проверка, что запрос завершился с ошибкой
-        console.log("Payload errors:", res.payload?.errors) // Проверка наличия errors
-
-        if (login.fulfilled.match(res)) {
-            reset()
-        } else if (login.rejected.match(res)) {
-            if (res.payload?.fieldsErrors?.length) {
-                res.payload.fieldsErrors.forEach((fieldError: FieldError) => {
-                    setError(fieldError.field as keyof Inputs, {
-                        type: "server",
-                        message: fieldError.error,
-                    })
-                })
-            } else if (res.payload?.errors) {				
-                alert(res.payload.errors.join("\n"))
+        login(data).then((res) => {
+            if (res.data?.resultCode === ResultCode.Success) { 
+                dispatch(setIsLoggedIn({ isLoggedIn: true }))
+                localStorage.setItem("sn-token", res.data.data.token)
             }
-        }
+            reset()
+        })
+
+        // const res = (await dispatch(login(data))) as {
+        //     payload?: { errors: string[]; fieldsErrors?: FieldError[] }
+        // }
+
+        // if (login.fulfilled.match(res)) {
+        //     reset()
+        // } else if (login.rejected.match(res)) {
+        //     if (res.payload?.fieldsErrors?.length) {
+        //         res.payload.fieldsErrors.forEach((fieldError: FieldError) => {
+        //             setError(fieldError.field as keyof Inputs, {
+        //                 type: "server",
+        //                 message: fieldError.error,
+        //             })
+        //         })
+        //     } else if (res.payload?.errors) {
+        //         alert(res.payload.errors.join("\n"))
+        //     }
+        // }
     }
 
     if (isLoggedIn) {
