@@ -1,7 +1,6 @@
-import { instance } from "common/instance"
-import { BaseResponse } from "common/types"
-import { DomainTask, GetTasksResponse, UpdateTaskDomainModel, UpdateTaskModel } from "./tasksApi.types"
 import { baseApi } from "app/baseApi"
+import { BaseResponse } from "common/types"
+import { DomainTask, GetTasksResponse, UpdateTaskDomainModel } from "./tasksApi.types"
 
 export const taskAPI = baseApi.injectEndpoints({
     endpoints(builder) {

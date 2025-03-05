@@ -3,19 +3,14 @@ import { UnknownAction } from "redux"
 import { ThunkDispatch } from "redux-thunk"
 // import { authReducer, authSlice } from "../features/auth/model/auth-slice"
 
-import { todolistsReducer, todolistsSlice } from "../features/todolists/model/todolistsSlice"
-import { appReducer, appSlice } from "./app-slice"
-import { todolistsApi } from "features/todolists/api/todolistsApi"
 import { setupListeners } from "@reduxjs/toolkit/query"
+import { appReducer, appSlice } from "./app-slice"
 import { baseApi } from "./baseApi"
 
 export const store = configureStore({
     reducer: {
-        [todolistsSlice.name]: todolistsReducer,
         [baseApi.reducerPath]: baseApi.reducer,
-
         [appSlice.name]: appReducer,
-        // [authSlice.name]: authReducer,
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(baseApi.middleware),
 })
