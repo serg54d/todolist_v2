@@ -4,14 +4,14 @@ import IconButton from "@mui/material/IconButton"
 import LinearProgress from "@mui/material/LinearProgress"
 import Switch from "@mui/material/Switch"
 import Toolbar from "@mui/material/Toolbar"
+import { MenuButton } from "common/components"
 import { useAppDispatch, useAppSelector } from "common/hooks"
 import { getTheme } from "common/theme"
-import { MenuButton } from "common/components"
 // import { logout, selectIsLoggedIn } from "../../../features/auth/model/auth-slice"
 import { changeTheme, selectAppStatus, selectIsLoggedIn, selectThemeMode, setIsLoggedIn } from "app/app-slice"
-import { useLogoutMutation } from "features/auth/api/authAPI"
+import { baseApi } from "app/baseApi"
 import { ResultCode } from "common/enums"
-import { clearTasksAndTodolists } from "common/actions/common.actions"
+import { useLogoutMutation } from "features/auth/api/authAPI"
 
 export const Header = () => {
     const dispatch = useAppDispatch()
@@ -27,13 +27,18 @@ export const Header = () => {
     }
 
     const logoutHandler = () => {
-        logout().then((res) => {
-            if (res.data?.resultCode === ResultCode.Success) {
-				dispatch(setIsLoggedIn({isLoggedIn: false}))
-                dispatch(clearTasksAndTodolists())
-                localStorage.removeItem("sn-token")
-            }
-        })
+        logout()
+            .then((res) => {
+                if (res.data?.resultCode === ResultCode.Success) {
+                    dispatch(setIsLoggedIn({ isLoggedIn: false }))
+                    // dispatch(clearTasksAndTodolists())
+                    localStorage.removeItem("sn-token")
+                    // dispatch(baseApi.util.resetApiState())
+                }
+            })
+            .then(() => {
+                dispatch(baseApi.util.invalidateTags(["Todolist", "Tasks"]))
+            })
     }
 
     return (

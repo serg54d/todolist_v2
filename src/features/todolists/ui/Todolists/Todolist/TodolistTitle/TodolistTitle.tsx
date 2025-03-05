@@ -4,7 +4,8 @@ import { EditableSpan } from "common/components"
 import { useAppDispatch } from "common/hooks"
 import { DomainTodolist, removeTodolist, updateTodolistTitle } from "../../../../model/todolistsSlice"
 import s from "./TodolistTitle.module.css"
-import { useDeleteTodolistMutation, useUpdateTodolistMutation } from "features/todolists/api/todolistsApi"
+import { todolistsApi, useDeleteTodolistMutation, useUpdateTodolistMutation } from "features/todolists/api/todolistsApi"
+import { RequestStatus } from "app/app-slice"
 
 type Props = {
     todolist: DomainTodolist
@@ -13,16 +14,37 @@ type Props = {
 export const TodolistTitle = ({ todolist }: Props) => {
     const { title, id, entityStatus } = todolist
 
-      const dispatch = useAppDispatch()
-	const [deleteTodolist] = useDeleteTodolistMutation()
-	const [updateTodolist] = useUpdateTodolistMutation()
+    const dispatch = useAppDispatch()
+    const [deleteTodolist] = useDeleteTodolistMutation()
+    const [updateTodolist] = useUpdateTodolistMutation()
+
+    const updateQueryData = (status: RequestStatus) => {
+        dispatch(
+            todolistsApi.util.updateQueryData("getTodolists", undefined, (state) => {
+                const index = state.findIndex((tl) => tl.id === id)
+                if (index !== -1) {
+                    state[index].entityStatus = status
+                }
+            }),
+        )
+    }
+
     const removeTodolistHandler = () => {
         // dispatch(removeTodolist(id))
-		deleteTodolist(id)
+        updateQueryData("loading")
+
+        deleteTodolist(id)
+            .unwrap()
+            .then(() => {
+                updateQueryData("succeeded")
+            })
+            .catch(() => {
+                updateQueryData("failed")
+            })
     }
     const updateTodolistHandler = (title: string) => {
         // dispatch(updateTodolistTitle({ id, title }))
-		updateTodolist({id, title})
+        updateTodolist({ id, title })
     }
 
     return (
